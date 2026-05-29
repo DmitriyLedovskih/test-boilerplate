@@ -3,22 +3,37 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PostsModule } from './modules/posts/posts.module';
 import { CommentsModule } from './modules/comments/comments.module';
+import { AppConfigService } from './config/config.service';
+import { AppConfigModule } from './config/config.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forRoot({
-            type: 'postgres',
-            host: 'localhost',
-            port: 5432,
-            username: 'postgres',
-            password: 'postgres',
-            database: 'test-boilerplate',
-            autoLoadEntities: true,
-            synchronize: true,
+        AppConfigModule,
+        TypeOrmModule.forRootAsync({
+            imports: [],
+            useFactory: (configService: AppConfigService) => ({
+                type: 'postgres',
+                host: configService.postgresHost,
+                port: configService.postgresPort,
+                username: configService.postgresUser,
+                password: configService.postgresPassword,
+                database: configService.postgresDatabase,
+                entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+                synchronize: configService.isDevelopment,
+                logging: configService.isDevelopment,
+            }),
+            inject: [AppConfigService],
         }),
-        MongooseModule.forRoot('mongodb://localhost:27017/test-boilerplate'),
+        MongooseModule.forRootAsync({
+            useFactory: (configService: AppConfigService) => ({
+                uri: configService.mongoUri,
+            }),
+            inject: [AppConfigService],
+        }),
         PostsModule,
         CommentsModule,
     ],
+    providers: [AppConfigService],
+    exports: [AppConfigService],
 })
 export class AppModule {}
