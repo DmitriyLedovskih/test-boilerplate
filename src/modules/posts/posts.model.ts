@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity()
+@Entity('posts')
 export class Post {
     @PrimaryGeneratedColumn()
     id: string;
@@ -8,6 +8,6 @@ export class Post {
     @Column()
     title: string;
 
-    @Column()
+    @Column('text')
     text: string;
 }

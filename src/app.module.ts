@@ -18,7 +18,7 @@ import { AppConfigModule } from './config/config.module';
                 username: configService.postgresUser,
                 password: configService.postgresPassword,
                 database: configService.postgresDatabase,
-                entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+                autoLoadEntities: true,
                 synchronize: configService.isDevelopment,
                 logging: configService.isDevelopment,
             }),
