@@ -1,11 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { CommentsRepository } from './comments.repository';
+import { CreateCommentDto, CommentResponseDto } from './comments.dto';
 
 @Injectable()
 export class CommentsService {
     constructor(private readonly commentsRepository: CommentsRepository) {}
 
-    public async create(): Promise<void> {}
+    public async create(createCommentDto: CreateCommentDto): Promise<CommentResponseDto> {
+        const comment = await this.commentsRepository.create(createCommentDto);
+        return new CommentResponseDto({
+            id: (comment as any)._id,
+            postId: comment.postId,
+            text: comment.text,
+            rating: comment.rating,
+            author: comment.author,
+            createdAt: (comment as any).createdAt,
+            updatedAt: (comment as any).updatedAt,
+        });
+    }
 
-    public async findAllByPostID(): Promise<void> {}
+    public async findAllByPostID(postId: number): Promise<CommentResponseDto[]> {
+        const comments = await this.commentsRepository.findAllByPostID(postId);
+        return comments.map(
+            (comment) =>
+                new CommentResponseDto({
+                    id: (comment as any)._id,
+                    postId: comment.postId,
+                    text: comment.text,
+                    rating: comment.rating,
+                    author: comment.author,
+                    createdAt: (comment as any).createdAt,
+                    updatedAt: (comment as any).updatedAt,
+                })
+        );
+    }
 }

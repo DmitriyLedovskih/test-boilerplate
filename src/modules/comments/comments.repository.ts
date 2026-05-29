@@ -1,12 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Comment } from './comments.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Comment, CommentDocument } from './comments.model';
+import { CreateCommentDto } from './comments.dto';
 
 @Injectable()
 export class CommentsRepository {
     constructor(
-        @InjectRepository(Comment)
-        private readonly commentModel: Repository<Comment>
+        @InjectModel(Comment.name)
+        private readonly commentModel: Model<CommentDocument>
     ) {}
+
+    async create(createCommentDto: CreateCommentDto): Promise<Comment> {
+        const newComment = new this.commentModel(createCommentDto);
+        return newComment.save();
+    }
+
+    async findAllByPostID(postId: number): Promise<Comment[]> {
+        return this.commentModel.find({ postId }).exec();
+    }
 }
