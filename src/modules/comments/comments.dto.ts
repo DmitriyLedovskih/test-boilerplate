@@ -1,19 +1,23 @@
 import { Expose } from 'class-transformer';
-import { IsString, IsNotEmpty, IsInt, Min, Max } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, Min, Max, ValidateIf, Length } from 'class-validator';
 
 export class CreateCommentDto {
     @IsNotEmpty({ message: 'postId не может быть пустым' })
     @IsInt()
     postId: number;
 
-    @IsNotEmpty({ message: 'text не может быть пустым' })
-    @IsString()
-    text: string;
+    @ValidateIf((o) => o.rating >= 2 && o.rating <= 4)
+    @IsNotEmpty({ message: 'При оценке от 2 до 4 баллов текст отзыва обязателен' })
+    @IsString({ message: 'text должен быть строкой' })
+    @Length(10, 1000, { message: 'Текст отзыва должен содержать не менее 10 символов' })
+    @Expose()
+    text?: string;
 
     @IsNotEmpty({ message: 'rating не может быть пустым' })
-    @IsInt()
+    @IsInt({ message: 'rating должен быть числом' })
     @Min(1, { message: 'rating должен быть от 1 до 5' })
     @Max(5, { message: 'rating должен быть от 1 до 5' })
+    @Expose()
     rating: number;
 
     @IsNotEmpty({ message: 'author не может быть пустым' })

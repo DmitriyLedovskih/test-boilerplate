@@ -8,7 +8,7 @@ export class Comment {
     @Prop({ required: true, type: Number })
     public postId: number;
 
-    @Prop({ required: true, type: String })
+    @Prop({ type: String, default: '' })
     public text: string;
 
     @Prop({ required: true, type: Number, min: 1, max: 5 })

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CommentsRepository } from './comments.repository';
 import { CreateCommentDto, CommentResponseDto } from './comments.dto';
 
@@ -7,11 +7,16 @@ export class CommentsService {
     constructor(private readonly commentsRepository: CommentsRepository) {}
 
     public async create(createCommentDto: CreateCommentDto): Promise<CommentResponseDto> {
-        const comment = await this.commentsRepository.create(createCommentDto);
+        const commentData = {
+            ...createCommentDto,
+            text: createCommentDto.text || '',
+        };
+
+        const comment = await this.commentsRepository.create(commentData);
         return new CommentResponseDto({
-            id: (comment as any)._id,
+            id: (comment as any)._id?.toString(),
             postId: comment.postId,
-            text: comment.text,
+            text: comment.text || '',
             rating: comment.rating,
             author: comment.author,
             createdAt: (comment as any).createdAt,
@@ -24,9 +29,9 @@ export class CommentsService {
         return comments.map(
             (comment) =>
                 new CommentResponseDto({
-                    id: (comment as any)._id,
+                    id: (comment as any)._id?.toString(),
                     postId: comment.postId,
-                    text: comment.text,
+                    text: comment.text || '',
                     rating: comment.rating,
                     author: comment.author,
                     createdAt: (comment as any).createdAt,

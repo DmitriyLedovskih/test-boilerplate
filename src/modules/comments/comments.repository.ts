@@ -12,7 +12,11 @@ export class CommentsRepository {
     ) {}
 
     async create(createCommentDto: CreateCommentDto): Promise<Comment> {
-        const newComment = new this.commentModel(createCommentDto);
+        const data = {
+            ...createCommentDto,
+            text: createCommentDto.text || '',
+        };
+        const newComment = new this.commentModel(data);
         return newComment.save();
     }
 
